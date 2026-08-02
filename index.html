@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UPI QR Code Generator | SMGC PVT LTD</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- QRCode.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    .color-picker-wrapper::-webkit-color-swatch-wrapper { padding: 0; }
+    .color-picker-wrapper::-webkit-color-swatch { border: none; border-radius: 0.375rem; }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 min-h-screen flex flex-col items-center justify-between p-4 md:p-8">
+
+  <!-- Header Banner -->
+  <header class="text-center my-4">
+    <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+      UPI QR Code Generator
+    </h1>
+    <p class="text-gray-600 mt-2 text-sm md:text-base">
+      Generate instant, custom-styled payment QR codes for any UPI app.
+    </p>
+  </header>
+
+  <!-- Main Generator Card -->
+  <main class="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-12 border border-gray-100 my-auto">
+    
+    <!-- Left Panel: Form Controls -->
+    <div class="md:col-span-7 p-6 md:p-8 space-y-5">
+      <h2 class="text-xl font-bold text-gray-800 border-b pb-3">Payment Details</h2>
+
+      <form id="qrForm" class="space-y-4" onsubmit="return false;">
+        <!-- Payee Name -->
+        <div>
+          <label for="payeeName" class="block text-xs font-semibold uppercase text-gray-600 mb-1">
+            Payee / Business Name <span class="text-red-500">*</span>
+          </label>
+          <input type="text" id="payeeName" value="Suhan" placeholder="e.g. Suhan" required
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
+        </div>
+
+        <!-- UPI ID -->
+        <div>
+          <label for="upiId" class="block text-xs font-semibold uppercase text-gray-600 mb-1">
+            UPI ID / VPA <span class="text-red-500">*</span>
+          </label>
+          <input type="text" id="upiId" value="9133359954@axl" placeholder="e.g. 9133359954@axl" required
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
+        </div>
+
+        <!-- Amount & Remarks -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="amount" class="block text-xs font-semibold uppercase text-gray-600 mb-1">
+              Amount (₹) <span class="text-gray-400 font-normal">(Optional)</span>
+            </label>
+            <input type="number" id="amount" step="0.01" min="1" placeholder="e.g. 500"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
+          </div>
+          <div>
+            <label for="remarks" class="block text-xs font-semibold uppercase text-gray-600 mb-1">
+              Remarks <span class="text-gray-400 font-normal">(Optional)</span>
+            </label>
+            <input type="text" id="remarks" placeholder="e.g. Payment"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
+          </div>
+        </div>
+
+        <!-- Merchant Metadata Controls -->
+        <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-gray-600">Merchant Flags</span>
+            <label class="inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="useMerchantFormat" checked class="sr-only peer">
+              <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 relative"></div>
+            </label>
+          </div>
+
+          <div id="merchantFields" class="grid grid-cols-3 gap-2">
+            <div>
+              <label for="mcCode" class="block text-[10px] font-semibold text-gray-500">MC</label>
+              <input type="text" id="mcCode" value="0000" class="w-full px-2 py-1 text-xs border rounded bg-white" />
+            </div>
+            <div>
+              <label for="modeCode" class="block text-[10px] font-semibold text-gray-500">MODE</label>
+              <input type="text" id="modeCode" value="02" class="w-full px-2 py-1 text-xs border rounded bg-white" />
+            </div>
+            <div>
+              <label for="purposeCode" class="block text-[10px] font-semibold text-gray-500">PURPOSE</label>
+              <input type="text" id="purposeCode" value="00" class="w-full px-2 py-1 text-xs border rounded bg-white" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Customization -->
+        <div class="pt-2">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Customization</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="qrColor" class="block text-xs font-medium text-gray-600 mb-1">QR Code Color</label>
+              <input type="color" id="qrColor" value="#000000" 
+                class="color-picker-wrapper w-full h-10 border border-gray-300 rounded-lg cursor-pointer" />
+            </div>
+            <div>
+              <label for="logoInput" class="block text-xs font-medium text-gray-600 mb-1">Center Logo (PNG/JPG)</label>
+              <input type="file" id="logoInput" accept="image/*"
+                class="w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <button type="button" id="generateBtn"
+          class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition duration-200">
+          Generate QR Code
+        </button>
+      </form>
+    </div>
+
+    <!-- Right Panel: Preview & Download -->
+    <div class="md:col-span-5 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 md:p-8 flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-gray-200">
+      
+      <!-- Canvas / QR Container Frame -->
+      <div class="relative bg-white p-5 rounded-2xl shadow-md border border-gray-200 flex flex-col items-center justify-center">
+        
+        <!-- Target render div for QRCode.js -->
+        <div id="qrCodeWrapper" class="relative w-48 h-48 flex items-center justify-center">
+          <div id="placeholderText" class="text-xs text-gray-400 text-center px-4">
+            Fill in details and click <span class="font-semibold text-gray-600">Generate</span> to preview your UPI QR code.
+          </div>
+        </div>
+
+        <!-- Payee Display Name Badge -->
+        <div id="badgeContainer" class="hidden mt-3 text-center w-full px-2">
+          <p id="badgeName" class="text-xs font-bold text-gray-800 uppercase tracking-wide truncate"></p>
+          <p id="badgeUpi" class="text-[10px] text-gray-500 truncate"></p>
+        </div>
+      </div>
+
+      <!-- Raw URI String Output -->
+      <div class="mt-4 w-full">
+        <label class="block text-[10px] font-semibold uppercase text-gray-400 text-center mb-1">Generated Payload</label>
+        <p id="rawUriOutput" class="text-[10px] font-mono text-gray-600 bg-white/70 p-2 rounded border border-gray-200 break-all text-center min-h-[32px] flex items-center justify-center">
+          -
+        </p>
+      </div>
+
+      <!-- Download Button -->
+      <button id="downloadBtn" disabled
+        class="mt-4 w-full max-w-xs bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold py-2.5 px-6 rounded-lg shadow transition duration-200 flex items-center justify-center gap-2">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/>
+        </svg>
+        Download PNG
+      </button>
+
+      <span class="text-[11px] text-gray-400 mt-4 text-center">
+        Compatible with Google Pay, PhonePe, Paytm, BHIM, and 60+ UPI apps.
+      </span>
+    </div>
+
+  </main>
+
+  <!-- Bottom Copyright Footer -->
+  <footer class="text-center my-4 text-xs text-gray-500">
+    &copy; All rights reserved by SMGC PVT LTD
+  </footer>
+
+  <!-- JavaScript Logic -->
+  <script>
+    const payeeNameInput = document.getElementById('payeeName');
+    const upiIdInput = document.getElementById('upiId');
+    const amountInput = document.getElementById('amount');
+    const remarksInput = document.getElementById('remarks');
+    const qrColorInput = document.getElementById('qrColor');
+    const logoInput = document.getElementById('logoInput');
+
+    const useMerchantFormat = document.getElementById('useMerchantFormat');
+    const merchantFields = document.getElementById('merchantFields');
+    const mcCode = document.getElementById('mcCode');
+    const modeCode = document.getElementById('modeCode');
+    const purposeCode = document.getElementById('purposeCode');
+
+    const generateBtn = document.getElementById('generateBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const qrCodeWrapper = document.getElementById('qrCodeWrapper');
+    const badgeContainer = document.getElementById('badgeContainer');
+    const badgeName = document.getElementById('badgeName');
+    const badgeUpi = document.getElementById('badgeUpi');
+    const rawUriOutput = document.getElementById('rawUriOutput');
+
+    let customLogoImg = null;
+
+    // Toggle merchant input visibility
+    useMerchantFormat.addEventListener('change', function() {
+      merchantFields.classList.toggle('hidden', !this.checked);
+    });
+
+    // Handle logo upload
+    logoInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const img = new Image();
+          img.onload = function() { customLogoImg = img; };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        customLogoImg = null;
+      }
+    });
+
+    // Core Generation Logic
+    function generateQR() {
+      const name = payeeNameInput.value.trim();
+      const upi = upiIdInput.value.trim();
+      const amount = amountInput.value.trim();
+      const remarks = remarksInput.value.trim();
+      const qrColor = qrColorInput.value;
+
+      if (!name || !upi) {
+        alert("Please enter both Payee Name and UPI ID.");
+        return;
+      }
+
+      // Base UPI URI Standard (Keep 'pa' raw so '@' is preserved for PhonePe/Agent apps)
+      let upiUri = `upi://pay?pa=${upi}&pn=${encodeURIComponent(name)}&cu=INR`;
+
+      // Append Merchant parameters if enabled
+      if (useMerchantFormat.checked) {
+        const mc = mcCode.value.trim() || '0000';
+        const mode = modeCode.value.trim() || '02';
+        const purpose = purposeCode.value.trim() || '00';
+        upiUri += `&mc=${encodeURIComponent(mc)}&mode=${encodeURIComponent(mode)}&purpose=${encodeURIComponent(purpose)}`;
+      }
+
+      // Append optional Amount & Remarks
+      if (amount) upiUri += `&am=${encodeURIComponent(amount)}`;
+      if (remarks) upiUri += `&tn=${encodeURIComponent(remarks)}`;
+
+      // Display Raw String
+      rawUriOutput.textContent = upiUri;
+
+      // Clear previous canvas
+      qrCodeWrapper.innerHTML = '';
+
+      // Render new QR Code
+      const qrInstance = new QRCode(qrCodeWrapper, {
+        text: upiUri,
+        width: 192,
+        height: 192,
+        colorDark: qrColor,
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      // Update UI Badges
+      badgeName.textContent = name;
+      badgeUpi.textContent = upi;
+      badgeContainer.classList.remove('hidden');
+
+      // Draw custom logo onto Canvas if provided
+      setTimeout(() => {
+        const canvas = qrCodeWrapper.querySelector('canvas');
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          
+          if (customLogoImg) {
+            const logoSize = 42;
+            const x = (canvas.width - logoSize) / 2;
+            const y = (canvas.height - logoSize) / 2;
+
+            // White circular background behind center logo for clarity
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, (logoSize / 2) + 2, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Draw Logo Image
+            ctx.drawImage(customLogoImg, x, y, logoSize, logoSize);
+          }
+        }
+        downloadBtn.removeAttribute('disabled');
+      }, 100);
+    }
+
+    // Trigger on Button Click
+    generateBtn.addEventListener('click', generateQR);
+
+    // Trigger on Enter Key inside input fields
+    document.getElementById('qrForm').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        generateQR();
+      }
+    });
+
+    // Download PNG Action
+    downloadBtn.addEventListener('click', function() {
+      const canvas = qrCodeWrapper.querySelector('canvas');
+      
+      if (canvas) {
+        const dataUrl = canvas.toDataURL("image/png");
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = `UPI-QR-${payeeNameInput.value.trim().replace(/\s+/g, '_')}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    });
+  </script>
+</body>
+</html>
